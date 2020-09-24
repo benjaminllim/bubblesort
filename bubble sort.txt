@@ -1,0 +1,437 @@
+#!/bin/bash
+#. /home/benjaminllim/FunctionsSorting
+
+gobacktomenu() {
+gobacktomenu=1
+echo ""
+echo ""
+echo ""
+
+while [ $gobacktomenu -eq 1 ]		
+do
+
+read -p "Press any to go back to menu
+" gobacktomenuinput
+#Only allows a single character
+     if [[ $gobacktomenuinput =~ ^[a-z|A-Z|0-9]$ ]] 
+     then
+	gobacktomenu=0
+	menu "${qsales[@]}" "${salesperson[@]}" "$nosalesperson" "${bonus[@]}"
+	else
+	echo -e "\e[0;31mPlease press M\e[0m
+"
+	gobacktomenu=1
+
+	
+	fi
+
+done
+
+
+}
+
+showsalespersons() {
+clear
+
+if [[ $nosalesperson -eq 0 ]]
+then
+	echo -e "\e[0;31mNo info about salespersons to show\e[0m"
+	gobacktomenu
+else
+	echo "================================================================================"
+	echo -e "\e[1;32mSALESPERSONS INFO\e[0m"
+	echo "================================================================================"
+	echo "The number of the salesmen/saleswomen are:"
+	echo -e "\e[1;32m$nosalesperson\e[0m"
+	echo ""
+	echo "The names, sales and bonuses of the salespersons are:"
+	echo ""
+		for (( i=0;i<=${#salesperson[$i]};i++ ))       
+		do
+			echo -e "\e[1;32m${salesperson[$i]}\e[0m"
+			echo ""
+		done
+
+		for (( i=0;i<=${#qsales[$i]};i++ ))       
+		do
+			echo -e "\e[1;32m£${qsales[$i]}\e[0m"
+			echo ""
+		done
+
+
+		for (( i=0;i<=${#bonus[$i]};i++ ))       
+		do
+			echo -e "\e[1;32m${bonus[$i]}\e[0m"
+			echo ""
+		done
+	
+	
+	gobacktomenu "${qsales[@]}" "${salesperson[@]}" "$nosalesperson" 
+	"${bonus[@]}"
+fi
+
+
+
+
+}
+
+savedata() {
+clear
+echo "================================================================================"
+echo -e "\e[1;32mSAVE DATA TO TEXT FILE\e[0m"
+echo "================================================================================"
+
+	
+read -p "Would you like to save your data as a text file? 
+S to save and anything else to go back to menu
+" saveinput
+if [[ $saveinput =~ ^[s|S]$ ]] 
+then
+	printf "%s\n" "${bonus[@]}" >> savedata.txt
+	printf "%s\n" "${salesperson[@]}" >> savedata.txt
+	
+	
+else
+	menu "${qsales[@]}" "${salesperson[@]}" "$nosalesperson" "${bonus[@]}"
+	
+fi
+
+echo ""
+echo ""
+echo ""
+echo -e "\e[1;32mData saved.\e[0m"
+sleep 5
+showsavedata
+
+}
+
+showsavedata() {
+clear
+echo "================================================================================"
+echo -e "\e[1;32mSHOW CONTENTS OF SAVED DATA\e[0m"
+echo "================================================================================"
+
+
+		
+echo ""
+read -p "Press S to show the saved data or any other input to go to menu
+" showdatainput
+
+if [[ $showdatainput =~ ^[s|S]$ ]] 
+then
+	
+	echo `chmod 777 savedata.txt`
+	echo `cat -n savedata.txt`
+	
+	gobacktomenu "${qsales[@]}" "${salesperson[@]}" "$nosalesperson" 
+	"${bonus[@]}"
+
+else
+	menu "${qsales[@]}" "${salesperson[@]}" "$nosalesperson" "${bonus[@]}"
+fi
+
+
+}
+
+sortsales() {
+	
+for (( i=0;i<=${#qsales[$i]};i++ ))       
+do
+    for (( j=0; j<=${#qsales[$j]};j++))
+    do
+        if [[ ${qsales[$i]} -gt ${qsales[$j]} ]]
+        then
+        
+	t=${qsales[$i]}
+	u=${salesperson[$i]}
+	s=${bonus[$i]}
+        qsales[$i]=${qsales[$j]}
+	salesperson[$i]=${salesperson[$j]}
+	bonus[$i]=${bonus[$j]}
+        qsales[$j]=$t
+	salesperson[$j]=$u
+	bonus[$j]=$s
+
+
+        fi
+    done
+done	
+
+clear
+echo "================================================================================"
+echo -e "\e[1;32mSORTED SALES FROM MOST SALES \e[0m"
+echo "================================================================================"
+echo ""
+
+for (( i=0;i<=${#qsales[$i]};i++ ))       
+do
+	echo -e "\e[1;32m£${qsales[$i]}\e[0m"
+	echo ""
+done
+
+
+for (( i=0;i<=${#salesperson[$i]};i++ ))       
+do
+	echo -e "\e[1;32m${salesperson[$i]}\e[0m"
+	echo ""
+done
+
+
+
+for (( i=0;i<=${#bonus[$i]};i++ ))       
+do
+	echo -e "\e[1;32m${bonus[$i]}\e[0m"
+	echo ""
+done
+
+echo ""
+echo ""
+echo ""
+#User option to re-do sort or go back to menu
+salesloop=1
+while [ $salesloop -eq 1 ]
+do
+read -p "Do you want to do the Sales sort again or go back to menu?
+
+A for again or any other input for menu
+" salesinput
+#Only allows a single character
+	if [[ $salesinput =~ ^[a|A]$ ]] 
+                then
+		salesloop=0
+		calculate_bonus "${qsales[@]}" "${salesperson[@]}" "$nosalesperson" 			"${bonus[@]}" 
+               			
+		else	
+		salesloop=0
+		menu "${qsales[@]}" "${salesperson[@]}" "$nosalesperson" 
+		"${bonus[@]}" 
+		
+		
+	fi
+
+done
+}
+
+sortsalespersons() {
+
+for (( i=0;i<=${#salesperson[$i]};i++ ))       
+do
+    for (( j=0; j<=${#salesperson[$j]} -1 - $i;j++))
+    do
+        if [[ ${salesperson[$i]} > ${salesperson[$j+1]} ]]
+        then
+                      
+	t=${salesperson[$j]}
+	s=${bonus[$j]}
+       	salesperson[$j]=${salesperson[$j+1]}
+        bonus[$j]=${bonus[$j+1]}
+	salesperson[$j+1]=$t
+	bonus[$j+1]=$s
+
+
+
+        fi
+    done
+done	
+
+clear
+echo "================================================================================"
+echo -e "\e[1;32mSORTED SALESPERSONS ALPHABETICALLY\e[0m"
+echo "================================================================================"
+echo ""
+
+
+for (( i=0;i<=${#salesperson[$i]};i++ ))       
+do
+	echo -e "\e[1;32m${salesperson[$i]}\e[0m"
+	echo ""
+done
+
+
+
+for (( i=0;i<=${#bonus[$i]};i++ ))       
+do
+	echo -e "\e[1;32m${bonus[$i]}\e[0m"
+	echo ""
+done
+
+echo ""
+echo ""
+echo ""
+#User option to re-do sort or go back to menu
+salespersonloop=1
+while [ $salespersonloop -eq 1 ]
+do
+read -p "Do you want to do the Salespersons sort again or go back to menu?
+
+A for again or any other input for menu
+" salespersonsinput
+#Only allows a single character
+if [[ $salespersonsinput =~ ^[a|A]$ ]] 
+                then
+		salespersonloop=0
+		calculate_bonus "${qsales[@]}" "${salesperson[@]}" "$nosalesperson" 			"${bonus[@]}"
+             	
+		else
+		salespersonloop=0
+		menu "${qsales[@]}" "${salesperson[@]}" "$nosalesperson" 
+		"${bonus[@]}"
+		
+                fi
+
+done
+
+}
+
+
+
+calculate_bonus() {
+declare -a salesperson
+declare -a qsales
+declare -a bonus
+
+
+
+bonusloop=1
+bonusloop2=1
+bonusloop3=1
+
+clear
+echo "================================================================================"
+echo -e "\e[1;32mCALCULATE BONUS OF YOUR SALES \e[0m"
+echo "================================================================================"
+
+	read -p "How many Salespersons would you like? " nosalesperson
+	echo -e "\e[1;32mYour number of salespersons is $nosalesperson \e[0m"
+
+	for (( name = 0; name < $nosalesperson ; name++ ))
+	do
+
+	read -p "What would you want to be your SalesPerson name: 
+" salesperson[$name] 
+
+	
+	done
+	
+
+	for (( no = 0; no < $nosalesperson ; no++ ))
+	do
+	
+	echo "What is your quarterly sales?" 
+	read -p "£" qsales[$no] bonus[$no]
+	
+	
+	if [[ ${qsales[$no]} =~ ^[0-9]+$ ]]
+	then
+	
+		if [ ${qsales[$no]} -lt 100000 ]
+       		then
+		
+		echo -e "\e[1;32m${salesperson[$no]}'s bonus is £0 \e[0m"
+		
+		bonus[$no]="${salesperson[$no]}'s bonus is £0"
+		
+
+		elif [[ ${qsales[$no]} -gt 999999 ]] 
+		then	
+		echo -e "\e[1;32m${salesperson[$no]}'s bonus is £1,500\e[0m"
+		bonus[$no]="${salesperson[$no]}'s bonus is £1,500"
+		
+			elif [[ ${qsales[$no]} -gt 99999 && ${qsales[$no]} -lt 				1000000 ]] 
+			then
+			echo -e "\e[1;32m${salesperson[$no]}'s bonus is £750 				\e[0m"
+			bonus[$no]="${salesperson[$no]}'s bonus is £750"
+			
+		fi
+	else
+	echo -e "\e[0;31mNumbers only. Please try again\e[0m"
+	fi
+
+
+	done	
+	
+echo -e "\e[1;32mAll bonuses have been calculated\e[0m"
+gobacktomenu "${qsales[@]}" "${salesperson[@]}" "$nosalesperson" "${bonus[@]}"
+
+}
+
+
+
+menu() {
+menuloop=1
+while [ $menuloop -eq 1 ]
+do
+	clear
+
+	echo 	"================================================================================"
+	echo -e "\e[1;32mWELCOME TO THE MENU \e[0m"
+	echo 	"================================================================================"
+	echo "Please select an option:
+"
+	echo "-Enter 1 to calculate your bonus"  
+	echo "-Enter 2 to save data as text file" 
+	echo "-Enter 3 to show contents of the saved data"  
+	echo "-Enter 4 to show Salespersons by name" 
+	echo "-Enter 5 to show order by most sales" 
+	echo "-Enter 6 to show Salespersons info"
+	read -p "-Enter 7 to exit
+" option
+
+	echo 	"================================================================================"
+
+case "$option" in
+1|-1|one|ONE)
+	calculate_bonus
+	menuloop=0
+	;;
+2|-2|two|TWO)
+	savedata "${qsales[@]}" "${salesperson[@]}" "$nosalesperson" "${bonus[@]}"
+	menuloop=0
+	;;
+
+3|-3|three|THREE)	
+	showsavedata "${qsales[@]}" "${salesperson[@]}" "$nosalesperson" 
+	"${bonus[@]}" 
+	menuloop=0
+
+	;;
+4|-4|-4|four|FOUR)
+	sortsalespersons "${qsales[@]}" "${salesperson[@]}" "$nosalesperson" 
+	"${bonus[@]}" 
+	menuloop=0
+	;;
+5|-5|five|FIVE)
+	sortsales "${qsales[@]}" "${salesperson[@]}" "$nosalesperson" "${bonus[@]}"
+	menuloop=0
+	;;
+6|-6|six|SIX)
+	showsalespersons "${qsales[@]}" "${salesperson[@]}" "$nosalesperson" 
+	"${bonus[@]}" 
+	menuloop=0
+	;;
+7|-7|seven|SEVEN)
+	clear
+	echo -e "\e[0;31mExiting terminal... \e[0m"
+	exit
+	;;
+
+*)
+	clear
+	echo -e "\e[0;31mInvalid input, please try again. \e[0m"
+	#This will wait x seconds before returning the command prompt 
+	sleep 3
+	menuloop=1
+	;;
+esac
+
+done
+
+}
+
+
+
+
+
+
+#Call the menu last as functions must exist first before calling
+menu
